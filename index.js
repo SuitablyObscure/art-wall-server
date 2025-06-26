@@ -1,30 +1,22 @@
 const express = require("express");
-const { google } = require("googleapis");
-const path = require("path");
+const axios = require("axios");
 require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-const drive = google.drive({
-  version: "v3",
-  auth: process.env.GOOGLE_API_KEY,
-});
-
-// Your shared Google Drive folder ID
 const FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID;
+const API_KEY = process.env.GOOGLE_API_KEY;
 
 app.get("/", async (req, res) => {
   try {
-    const response = await drive.files.list({
-      q: `'${FOLDER_ID}' in parents and mimeType contains 'image/' and trashed = false`,
-      fields: "files(id, name)",
-    });
+    const url = `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents+and+mimeType+contains+'image/'+and+trashed=false&key=${API_KEY}&fields=files(id,name)`;
 
+    const response = await axios.get(url);
     const files = response.data.files || [];
+
     const imageUrls = files.map(
-      (file) =>
-        `https://drive.google.com/uc?export=view&id=${file.id}`
+      (file) => `https://drive.google.com/uc?export=view&id=${file.id}`
     );
 
     const html = `
@@ -47,7 +39,7 @@ app.get("/", async (req, res) => {
 
     res.send(html);
   } catch (err) {
-    console.error("Error listing files:", err);
+    console.error("Error listing files:", err.response?.data || err.message);
     res.status(500).send("Something went wrong.");
   }
 });
