@@ -1,0 +1,57 @@
+const express = require("express");
+const { google } = require("googleapis");
+const path = require("path");
+require("dotenv").config();
+
+const app = express();
+const port = process.env.PORT || 3000;
+
+const drive = google.drive({
+  version: "v3",
+  auth: process.env.GOOGLE_API_KEY,
+});
+
+// Your shared Google Drive folder ID
+const FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID;
+
+app.get("/", async (req, res) => {
+  try {
+    const response = await drive.files.list({
+      q: `'${FOLDER_ID}' in parents and mimeType contains 'image/' and trashed = false`,
+      fields: "files(id, name)",
+    });
+
+    const files = response.data.files || [];
+    const imageUrls = files.map(
+      (file) =>
+        `https://drive.google.com/uc?export=view&id=${file.id}`
+    );
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8" />
+          <title>Art Wall</title>
+          <style>
+            body { background: #111; color: #fff; font-family: sans-serif; text-align: center; }
+            img { max-width: 90vw; margin: 1rem auto; display: block; border-radius: 8px; box-shadow: 0 0 10px rgba(255,255,255,0.1); }
+          </style>
+        </head>
+        <body>
+          <h1>✨ ART WALL ✨</h1>
+          ${imageUrls.map((url) => `<img src="${url}" alt="Art">`).join("\n")}
+        </body>
+      </html>
+    `;
+
+    res.send(html);
+  } catch (err) {
+    console.error("Error listing files:", err);
+    res.status(500).send("Something went wrong.");
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
