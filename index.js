@@ -18,15 +18,15 @@ app.get("/oauth2callback", async (req, res) => {
 
   try {
     const { tokens } = await oauth2Client.getToken(code);
-    console.log("✅ Refresh Token:", tokens.refresh_token);
-    res.send("Success! Check your Render logs for the refresh token.");
+    console.log("Refresh Token:", tokens.refresh_token);
+    res.send("Success! Refresh token logged to server logs.");
   } catch (err) {
-    console.error("❌ Error getting token:", err);
+    console.error("Error getting token:", err);
     res.send("Something went wrong.");
   }
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
