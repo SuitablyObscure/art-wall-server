@@ -35,7 +35,8 @@ app.get("/oauth2callback", async (req, res) => {
     res.send("Success! Refresh token logged to server logs.");
   } catch (err) {
     console.error("Error getting token:", err);
-    res.send("Something went wrong.");
+    console.error("OAuth callback error:", err);
+res.status(500).send("Something went wrong. Check server logs.");
   }
 });
 
