@@ -10,17 +10,19 @@ const oauth2Client = new google.auth.OAuth2(
   process.env.REDIRECT_URI
 );
 
-// Step 1: Route to start OAuth flow
-app.get("/auth", (req, res) => {
+// Step 1: Authorization URL generator
+app.get("/", (req, res) => {
+  const scopes = ["https://www.googleapis.com/auth/drive.readonly"];
   const url = oauth2Client.generateAuthUrl({
-    access_type: "offline", // required to get refresh token
-    scope: ["https://www.googleapis.com/auth/drive.readonly"],
-    prompt: "consent", // forces asking again to ensure refresh token is returned
+    access_type: "offline",
+    prompt: "consent",
+    scope: scopes,
   });
-  res.redirect(url);
+
+  res.send(`<a href="${url}">Authorize with Google</a>`);
 });
 
-// Step 2: OAuth callback route
+// Step 2: Handle Google callback
 app.get("/oauth2callback", async (req, res) => {
   const code = req.query.code;
   if (!code) {
@@ -29,17 +31,15 @@ app.get("/oauth2callback", async (req, res) => {
 
   try {
     const { tokens } = await oauth2Client.getToken(code);
-    oauth2Client.setCredentials(tokens);
-    console.log("Access Token:", tokens.access_token);
-    console.log("Refresh Token:", tokens.refresh_token); // ⬅️ You'll need this
-    res.send("✅ Success! Refresh token logged to server logs.");
+    console.log("Refresh Token:", tokens.refresh_token);
+    res.send("Success! Refresh token logged to server logs.");
   } catch (err) {
-    console.error("❌ Error getting token:", err.response?.data || err.message);
+    console.error("Error getting token:", err);
     res.send("Something went wrong.");
   }
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
