@@ -1,6 +1,5 @@
 const express = require("express");
 const { google } = require("googleapis");
-const path = require("path");
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -17,11 +16,9 @@ const drive = google.drive({ version: "v3", auth: oauth2Client });
 
 app.get("/", async (req, res) => {
   try {
-    const query = `'${FOLDER_ID}' in parents and mimeType contains 'image/' and trashed = false`;
-
     const result = await drive.files.list({
-      q: query,
-      fields: "files(id, name, mimeType)",
+      q: `'${FOLDER_ID}' in parents and mimeType contains 'image/' and trashed = false`,
+      fields: "files(id, name)",
     });
 
     const images = result.data.files.map(file => ({
@@ -46,14 +43,17 @@ app.get("/", async (req, res) => {
             text-align: center;
           }
           h1 {
-            margin-bottom: 1rem;
             font-size: 2rem;
+            margin-bottom: 1rem;
           }
           .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 1rem;
             padding: 0;
+          }
+          .grid figure {
+            margin: 0;
           }
           .grid img {
             width: 100%;
@@ -73,16 +73,11 @@ app.get("/", async (req, res) => {
         ${
           images.length > 0
             ? `<div class="grid">
-                ${images
-                  .map(
-                    img => `
-                      <figure>
-                        <img src="${img.src}" alt="${img.alt}" loading="lazy" />
-                        <figcaption>${img.alt}</figcaption>
-                      </figure>
-                    `
-                  )
-                  .join("")}
+                ${images.map(img => `
+                  <figure>
+                    <img src="${img.src}" alt="${img.alt}" loading="lazy" />
+                    <figcaption>${img.alt}</figcaption>
+                  </figure>`).join("")}
               </div>`
             : "<p>No images found. Check your Google Drive folder and try again.</p>"
         }
@@ -103,13 +98,13 @@ app.get("/oauth2callback", async (req, res) => {
     const { tokens } = await oauth2Client.getToken(code);
     oauth2Client.setCredentials(tokens);
     console.log("Refresh token:", tokens.refresh_token);
-    res.send("✅ Success! Refresh token logged to server logs.");
+    res.send("✅ Authorization successful. Refresh token logged to console.");
   } catch (err) {
     console.error("OAuth callback error:", err);
-    res.status(500).send("Something went wrong. Check server logs.");
+    res.status(500).send("Something went wrong during OAuth. Check logs.");
   }
 });
 
 app.listen(port, () => {
-  console.log(`Art Wall server running on port ${port}`);
+  console.log(`🎨 Art Wall server running on port ${port}`);
 });
