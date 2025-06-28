@@ -18,12 +18,12 @@ app.get("/", async (req, res) => {
   try {
     const result = await drive.files.list({
       q: `'${FOLDER_ID}' in parents and mimeType contains 'image/' and trashed = false`,
-      fields: "files(id, name)",
+      fields: "files(id, name, webContentLink)",
     });
 
     const images = result.data.files.map(file => ({
-      src: `https://drive.google.com/uc?export=view&id=${file.id}`,
-      alt: file.name
+      src: file.webContentLink?.replace("&export=download", "") || `https://drive.google.com/uc?export=view&id=${file.id}`,
+      alt: file.name,
     }));
 
     const html = `
@@ -79,7 +79,7 @@ app.get("/", async (req, res) => {
                     <figcaption>${img.alt}</figcaption>
                   </figure>`).join("")}
               </div>`
-            : "<p>No images found. Check your Google Drive folder and try again.</p>"
+            : "<p>No images found. Make sure your folder is public and contains images.</p>"
         }
       </body>
       </html>
@@ -98,7 +98,7 @@ app.get("/oauth2callback", async (req, res) => {
     const { tokens } = await oauth2Client.getToken(code);
     oauth2Client.setCredentials(tokens);
     console.log("Refresh token:", tokens.refresh_token);
-    res.send("✅ Authorization successful. Refresh token logged to console.");
+    res.send("Authorization successful. Refresh token logged to console.");
   } catch (err) {
     console.error("OAuth callback error:", err);
     res.status(500).send("Something went wrong during OAuth. Check logs.");
@@ -106,5 +106,5 @@ app.get("/oauth2callback", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`🎨 Art Wall server running on port ${port}`);
+  console.log(`Art Wall server running on port ${port}`);
 });
