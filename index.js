@@ -22,9 +22,9 @@ app.get("/", async (req, res) => {
     });
 
     const images = result.data.files.map(file => ({
-      src: `https://drive.google.com/uc?export=view&id=${file.id}`,
-      alt: file.name
-    }));
+  src: `https://lh3.googleusercontent.com/d/${file.id}=w1000`,
+  alt: file.name
+}));
 
     const html = `
       <!DOCTYPE html>
