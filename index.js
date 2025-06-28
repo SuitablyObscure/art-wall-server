@@ -34,36 +34,38 @@ app.get("/", async (req, res) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Art Wall</title>
         <style>
-          body {
-            font-family: sans-serif;
-            background: #111;
-            color: #fff;
-            margin: 0;
-            padding: 1rem;
-            text-align: center;
-          }
-          h1 {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-          }
-          .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-          }
-          figure {
-            margin: 0;
-          }
-          img {
-            width: 100%;
-            border-radius: 8px;
-            box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
-          }
-          figcaption {
-            font-size: 0.75rem;
-            color: #aaa;
-          }
-        </style>
+  body {
+    font-family: sans-serif;
+    background: #111;
+    color: #fff;
+    margin: 0;
+    padding: 1rem;
+    text-align: center;
+  }
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+  figure {
+    margin: 0;
+  }
+  img {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+  }
+  figcaption {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #ddd;
+    margin-top: 0.5rem;
+  }
+</style>
       </head>
       <body>
         <h1>Art Wall</h1>
