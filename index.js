@@ -73,7 +73,7 @@ app.get("/", async (req, res) => {
                 ${images.map(img => `
                   <figure>
                     <img src="${img.src}" alt="${img.alt}" loading="lazy" />
-                    <figcaption>${img.alt}</figcaption>
+                    <figcaption>${img.alt.replace(/\.[^/.]+$/, "")}</figcaption>
                   </figure>`).join("")}
               </div>`
             : "<p>No images found. Make sure your folder is public and contains images.</p>"
