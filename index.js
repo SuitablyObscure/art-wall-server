@@ -18,12 +18,12 @@ app.get("/", async (req, res) => {
   try {
     const result = await drive.files.list({
       q: `'${FOLDER_ID}' in parents and mimeType contains 'image/' and trashed = false`,
-      fields: "files(id, name, webContentLink)",
+      fields: "files(id, name)", // ← No need to fetch permissions
     });
 
     const images = result.data.files.map(file => ({
-      src: file.webContentLink?.replace("&export=download", "") || `https://drive.google.com/uc?export=view&id=${file.id}`,
-      alt: file.name,
+      src: `https://drive.google.com/uc?export=view&id=${file.id}`,
+      alt: file.name
     }));
 
     const html = `
@@ -50,20 +50,17 @@ app.get("/", async (req, res) => {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 1rem;
-            padding: 0;
           }
-          .grid figure {
+          figure {
             margin: 0;
           }
-          .grid img {
+          img {
             width: 100%;
-            height: auto;
             border-radius: 8px;
-            box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
           }
-          .grid figcaption {
+          figcaption {
             font-size: 0.75rem;
-            margin-top: 0.25rem;
             color: #aaa;
           }
         </style>
